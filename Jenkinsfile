@@ -34,20 +34,36 @@ pipeline{
                 sh "mvn test"
             }
         }
-        stage('MVN sonarqube'){
-            steps{
-                echo 'quality code';
-                withSonarQubeEnv('examenTpFoyer') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=examenTpFoyer'
-                }
-            }
-        }
+        //stage('MVN sonarqube'){
+             //steps{
+             //    echo 'quality code';
+             //    withSonarQubeEnv('examenTpFoyer') {
+             //        sh 'mvn sonar:sonar -Dsonar.projectKey=examenTpFoyer'
+            //     }
+           //  }
+      //   }
         stage('MVN deploy'){
             steps{
                 echo 'deploying';
                 sh "mvn deploy"
             }
         }
+         stage('Building image'){
+              steps{
+                 echo 'building ...';
+                 sh "docker build -t tahanicherif/foyer:1.0.0 ."
+              }
+         }
+
+          stage('pushing'){
+              steps{
+                  echo 'pushing to docker'
+                  //sh " docker push tahanicherif/foyer:1.0.0"
+                  withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                      sh " docker push tahanicherif/foyer:1.0.0"
+                  }
+              }
+          }
 
 
     }
