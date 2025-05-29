@@ -4,7 +4,7 @@ pipeline{
         stage('get from github'){
             steps{
                 echo 'pulling from tahani branch';
-                git branch : 'tahani-cherif-etudiant',
+                git branch : 'main',
                 url : 'https://github.com/TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
                 credentialsId:'32ac7f6b-311c-4b3a-b849-463b1195ef0a'
             }
