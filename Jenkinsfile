@@ -5,7 +5,7 @@ pipeline{
             steps{
                 echo 'pulling from tahani branch';
                 git branch : 'main',
-                url : 'https://github.com/TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
+                url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
                 credentialsId:'github-ssh-key'
             }
         }
