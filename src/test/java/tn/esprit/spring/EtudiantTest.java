@@ -1,23 +1,24 @@
 package tn.esprit.spring;
 
-import org.junit.Test;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.DAO.Entities.Etudiant;
 import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
+@Transactional
 public class EtudiantTest {
 
     @Autowired
@@ -40,7 +41,7 @@ public class EtudiantTest {
     @Test
     @Order(1)
     @DisplayName("Test Create Etudiant")
-    public void testCreateEtudiant() {
+    void testCreateEtudiant() {
         // Given
         assertNotNull(etudiantTest);
 
@@ -63,7 +64,7 @@ public class EtudiantTest {
     @Test
     @Order(2)
     @DisplayName("Test Read Etudiant by ID")
-    public void testReadEtudiantById() {
+    void testReadEtudiantById() {
         // Given
         Etudiant savedEtudiant = etudiantRepository.save(etudiantTest);
         Long etudiantId = savedEtudiant.getIdEtudiant();
@@ -83,7 +84,7 @@ public class EtudiantTest {
     @Test
     @Order(3)
     @DisplayName("Test Read All Etudiants")
-    public void testReadAllEtudiants() {
+    void testReadAllEtudiants() {
         // Given
         Etudiant etudiant1 = Etudiant.builder()
                 .nomEt("Martin")
@@ -117,7 +118,7 @@ public class EtudiantTest {
     @Test
     @Order(4)
     @DisplayName("Test Update Etudiant")
-    public void testUpdateEtudiant() {
+    void testUpdateEtudiant() {
         // Given
         Etudiant savedEtudiant = etudiantRepository.save(etudiantTest);
         Long etudiantId = savedEtudiant.getIdEtudiant();
@@ -143,7 +144,7 @@ public class EtudiantTest {
     @Test
     @Order(5)
     @DisplayName("Test Delete Etudiant")
-    public void testDeleteEtudiant() {
+    void testDeleteEtudiant() {
         // Given
         Etudiant savedEtudiant = etudiantRepository.save(etudiantTest);
         Long etudiantId = savedEtudiant.getIdEtudiant();
