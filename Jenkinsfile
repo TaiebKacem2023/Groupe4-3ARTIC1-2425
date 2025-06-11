@@ -12,7 +12,7 @@ pipeline{
 				echo 'pulling from taieb branch';
                 git branch : 'Taieb-Kacem-Foyer',
                 url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
-                credentialsId:'github-ssh-key'
+                credentialsId:'github-ssh'
             }
         }
         stage('MVN clean'){
