@@ -3,7 +3,7 @@ pipeline{
      environment {
 
 		SONARQUBE_SERVER = 'http://localhost:9000/'
-        SONAR_TOKEN = '9beb2f6037873917a7d46fcce27781e0710e898c'
+        SONAR_TOKEN = 'a476724a264cb65208717568adef73e9b079677c'
 
     }
     stages{

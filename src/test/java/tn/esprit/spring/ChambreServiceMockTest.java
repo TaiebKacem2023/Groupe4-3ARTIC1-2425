@@ -1,47 +1,58 @@
 package tn.esprit.spring;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import tn.esprit.spring.DAO.Entities.Chambre;
+import tn.esprit.spring.DAO.Entities.TypeChambre;
+import tn.esprit.spring.Services.Chambre.ChambreService;
+import tn.esprit.spring.DAO.Repositories.ChambreRepository;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
+import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.class)
-@SpringBootTest
-public class ChambreServiceMockTest {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class ChambreServiceTest {
+
+    @Mock
+    ChambreRepository chambreRepository;
+
+    @InjectMocks
+    ChambreService chambreService;
+
+    Chambre testChambre;
 
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
+        testChambre = Chambre.builder()
+                .idChambre(1L)
+                .numeroChambre(101L)
+                .typeC(TypeChambre.SIMPLE)
+                .build();
     }
 
-    @AfterEach
-    void afterEach() {
-
-    }
-
-    @Order(1)
-    @RepeatedTest(4)
-    void test() {
-
-    }
-
-    @Order(4)
     @Test
-    void test2() {
+    void testGetChambreById() {
+        when(chambreRepository.findById(1L)).thenReturn(Optional.of(testChambre));
 
+        Chambre result = chambreService.findById(1L);
+
+        assertNotNull(result);
+        assertEquals(101L, result.getNumeroChambre());
+        verify(chambreRepository, times(1)).findById(1L);
     }
 
-    @Order(2)
     @Test
-    void test3() {
+    void testAddChambre() {
+        when(chambreRepository.save(any(Chambre.class))).thenReturn(testChambre);
 
-    }
+        Chambre saved = chambreService.addOrUpdate(testChambre);
 
-    @Order(3)
-    @Test
-    void test4() {
-
+        assertNotNull(saved);
+        assertEquals(101L, saved.getNumeroChambre());
+        verify(chambreRepository).save(testChambre);
     }
 }

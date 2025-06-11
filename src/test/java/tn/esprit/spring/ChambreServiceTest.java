@@ -1,71 +1,61 @@
 package tn.esprit.spring;
 
-import org.junit.jupiter.api.*;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.DAO.Entities.Chambre;
-import tn.esprit.spring.DAO.Entities.TypeChambre;
-import tn.esprit.spring.Services.Chambre.ChambreService;
+import tn.esprit.spring.DAO.Entities.TypeChambre
+import tn.esprit.spring.DAO.Repositories.ChambreRepository;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
-@TestMethodOrder(MethodOrderer.class)
-@SpringBootTest
-public class ChambreServiceTest {
+import java.util.List;
 
-    @Autowired
-    private ChambreService chambreService;
+class ChambreTest {
 
-    public void testAjouterChambre () {
-        Chambre numChambre = Chambre.builder().numeroChambre(15).typeC(TypeChambre.DOUBLE).build();
-        Chambre savedChambre = chambreService.addOrUpdate(numChambre);
-        Assertions.assertNotNull(savedChambre.getIdChambre());
-        TypeChambre expectedTypeChambre = TypeChambre.DOUBLE;
-        Assertions.assertTrue(savedChambre.getNumeroChambre() > 0);
-    }
-
-    @BeforeAll
-    void before() {
-
-    }
-
-    @AfterAll
-    void after() {
-
-    }
+    private Chambre chambre;
 
     @BeforeEach
-    void beforeEach() {
-
+    void setUp() {
+        chambre = Chambre.builder()
+                .idChambre(1L)
+                .numeroChambre(101L)
+                .typeC(TypeChambre.SIMPLE)
+                .bloc(new Bloc())
+                .reservations(List.of(new Reservation(), new Reservation()))
+                .build();
     }
 
-    @AfterEach
-    void afterEach() {
-
-    }
-
-    @Order(1)
-    @RepeatedTest(4)
-    void test() {
-
-    }
-
-    @Order(4)
     @Test
-    void test2() {
-
+    void testChambreBuilder() {
+        assertNotNull(chambre);
+        assertEquals(1L, chambre.getIdChambre());
+        assertEquals(101L, chambre.getNumeroChambre());
+        assertEquals(TypeChambre.SIMPLE, chambre.getTypeC());
+        assertNotNull(chambre.getBloc());
+        assertEquals(2, chambre.getReservations().size());
     }
 
-    @Order(2)
     @Test
-    void test3() {
+    void testSettersAndGetters() {
+        Chambre c = new Chambre();
+        c.setIdChambre(2L);
+        c.setNumeroChambre(202L);
+        c.setTypeC(TypeChambre.DOUBLE);
+        Bloc b = new Bloc();
+        c.setBloc(b);
 
+        assertEquals(2L, c.getIdChambre());
+        assertEquals(202L, c.getNumeroChambre());
+        assertEquals(TypeChambre.DOUBLE, c.getTypeC());
+        assertEquals(b, c.getBloc());
     }
 
-    @Order(3)
     @Test
-    void test4() {
-
+    void testEmptyReservationsListByDefault() {
+        Chambre c = new Chambre();
+        assertNotNull(c.getReservations());
     }
 }
