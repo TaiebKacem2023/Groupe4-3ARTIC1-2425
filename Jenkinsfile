@@ -1,10 +1,8 @@
 pipeline{
     agent any
      environment {
-
         SONARQUBE_SERVER = 'http://localhost:9000/'
-        SONAR_TOKEN = '7d0837a136ed8d8f56c1a2f613ccacb567fc78b79ab67a37adae7b9b54078921'
-
+        SONAR_TOKEN = '04570e1f89a3b4ea53cca10f08a70357bbbd8139'
     }
     stages{
         stage('get from github'){
@@ -21,16 +19,17 @@ pipeline{
                sh "mvn clean"
             }
         }
-        // stage('MVN install'){
-        //     steps{
-        //         echo 'installing';
-        //          sh "mvn install"
-        //          }
-        // }
         stage('MVN compile'){
             steps{
                 echo 'compiling';
                 sh "mvn compile"
+            }
+        }
+
+        stage('MVN test'){
+            steps{
+                echo 'testing';
+                sh "mvn test"
             }
         }
         stage('SonarQube analysis') {
@@ -39,34 +38,26 @@ pipeline{
                 sh "mvn sonar:sonar -Dsonar.url=${SONARQUBE_SERVER} -Dsonar.login=${SONAR_TOKEN}"
             }
         }
-        stage('MVN test'){
-            steps{
-                echo 'testing';
-                sh "mvn test"
-            }
-        }
-        //stage('MVN sonarqube'){
-             //steps{
-             //    echo 'quality code';
-             //    withSonarQubeEnv('examenTpFoyer') {
-             //        sh 'mvn sonar:sonar -Dsonar.projectKey=examenTpFoyer'
-            //     }
-           //  }
-      //   }
         // stage('MVN deploy'){
         //     steps{
         //         echo 'deploying';
         //         sh "mvn deploy"
         //     }
         // }
-         stage('Building image'){
+        stage('MVN package'){
+            steps{
+                echo 'MVN package';
+                sh "mvn package"
+            }
+        }
+         stage('Building image docker'){
               steps{
                  echo 'building ...';
                  sh "docker build -t tahanicherif/foyer:1.0.0 ."
               }
          }
 
-         stage('pushing'){
+         stage('pushing docker hub'){
               steps{
                   echo 'pushing to docker'
                   sh "docker login -u tahanicherif -p tahani123"
