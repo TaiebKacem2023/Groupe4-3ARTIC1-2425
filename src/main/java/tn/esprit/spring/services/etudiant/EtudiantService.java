@@ -18,7 +18,9 @@ public class EtudiantService implements IEtudiantService {
 
     @Override
     public Etudiant addOrUpdate(Etudiant e) {
-        return repo.save(e);
+
+        Etudiant newEtudiant = repo.save(e);
+        return newEtudiant;
     }
 
     @Override
