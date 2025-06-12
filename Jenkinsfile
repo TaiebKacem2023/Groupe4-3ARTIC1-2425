@@ -3,19 +3,24 @@ pipeline{
      environment {
         SONARQUBE_SERVER = 'http://localhost:9000/'
         SONAR_TOKEN = '04570e1f89a3b4ea53cca10f08a70357bbbd8139'
+        DOCKERHUB_CREDENTIALS = 'token-dockerhub'
+        IMAGE_NAME = 'foyer'
+        IMAGE_TAG = 'latest'
     }
     stages{
-        //   stage('Set Version') {
-        //     steps {
-        //         sh "mvn versions:set -DnewVersion=${VERSION}"
-        //     }
-        // }
         stage('get from github'){
             steps{
                 echo 'pulling from tahani branch';
                 git branch : 'tahani-cherif-etudiant',
                 url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
                 credentialsId:'github-ssh-key'
+            }
+        }
+          stage('RUN DATABASE'){
+            steps{
+                echo 'run database';
+                sh "docker-compose up --build -d database"
+                sh "sleep 20"
             }
         }
         stage('MVN clean'){
@@ -49,39 +54,39 @@ pipeline{
                 sh "mvn package"
             }
         }
-        //       stage('Deploy to Nexus') {
-        //     steps {
-        //         script {
-        //             def pom = readMavenPom file: 'pom.xml'
-        //             def version = pom.version
-        //             def repo = version.contains("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
-        //             def repoUrl = "http://172.26.160.39:8081/repository/${repo}"
-
-        //             sh "mvn deploy"
-        //         }
-        //     }
-        // }
+              stage('Deploy to Nexus') {
+            steps {
+                script {
+                    sh "mvn deploy"
+                }
+            }
+        }
          stage('Building image docker'){
               steps{
                  echo 'building ...';
-                 sh "docker build -t tahanicherif/foyer:1.0.0 ."
+                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
               }
          }
-
-         stage('pushing docker hub'){
-              steps{
-                  echo 'pushing to docker'
-                  sh "docker login -u tahanicherif -p tahani123"
-                  sh " docker push tahanicherif/foyer:1.0.0"
-                //   withCredentials([usernamePassword(credentialsId: 'd8b99c11-39f9-49f8-8718-97581a71865a', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                //       sh " docker push tahanicherif/foyer:1.0.0"
-                //   }
-              }
-          }
+          stage('Push docker image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: DOCKERHUB_CREDENTIALS,
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                )]) {
+                    echo 'Login ...'
+                    sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                    echo 'Tagging image...'
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    echo 'Pushing docker image to docker hub...'
+                    sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
            stage('Docker Compose') {
             steps {
                 sh 'docker-compose down || true'
-                sh 'docker-compose up -d'
+                sh 'docker-compose up -d --build'
             }
         }
 
