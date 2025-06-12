@@ -48,27 +48,38 @@ public class EtudiantService implements IEtudiantService {
     }
 
     @Override
-    public void affecterReservationAEtudiant
-            (String idR, String nomE, String prenomE) {
-        // ManyToMany: Reservation(Child) -- Etudiant(Parent)
-        // 1- Récupérer les objets
-        Reservation res= reservationRepository.findById(idR).get();
-        Etudiant et= repo.getByNomEtAndPrenomEt(nomE,prenomE);
+    public void affecterReservationAEtudiant(String idR, String nomE, String prenomE) {
+        // 1- Récupérer les objets avec contrôle de présence
+        Reservation res = reservationRepository.findById(idR)
+                .orElseThrow(() -> new EntityNotFoundException("Réservation non trouvée avec ID: " + idR));
+
+        Etudiant et = repo.getByNomEtAndPrenomEt(nomE, prenomE);
+        if (et == null) {
+            throw new EntityNotFoundException("Étudiant non trouvé: " + nomE + " " + prenomE);
+        }
+
         // 2- Affectation: On affecte le child au parent
         et.getReservations().add(res);
+
         // 3- Save du parent
         repo.save(et);
     }
     @Override
-    public void desaffecterReservationAEtudiant
-            (String idR, String nomE, String prenomE) {
-        // ManyToMany: Reservation(Child) -- Etudiant(Parent)
-        // 1- Récupérer les objets
-        Reservation res= reservationRepository.findById(idR).get();
-        Etudiant et= repo.getByNomEtAndPrenomEt(nomE,prenomE);
-        // 2- Affectation: On desaffecte le child au parent
+    public void desaffecterReservationAEtudiant(String idR, String nomE, String prenomE) {
+        // 1- Récupérer les objets avec vérification
+        Reservation res = reservationRepository.findById(idR)
+                .orElseThrow(() -> new EntityNotFoundException("Réservation non trouvée avec ID: " + idR));
+
+        Etudiant et = repo.getByNomEtAndPrenomEt(nomE, prenomE);
+        if (et == null) {
+            throw new EntityNotFoundException("Étudiant non trouvé: " + nomE + " " + prenomE);
+        }
+
+        // 2- Désaffectation: retirer le child du parent
         et.getReservations().remove(res);
+
         // 3- Save du parent
         repo.save(et);
     }
+
 }

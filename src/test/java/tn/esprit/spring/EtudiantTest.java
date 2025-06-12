@@ -52,14 +52,25 @@ public class EtudiantTest {
         // Then
         assertNotNull(savedEtudiant);
         assertNotNull(savedEtudiant.getIdEtudiant());
-        assertEquals("Dupont", savedEtudiant.getNomEt());
-        assertEquals("Jean", savedEtudiant.getPrenomEt());
-        assertEquals(12345678L, savedEtudiant.getCin());
-        assertEquals("ESPRIT", savedEtudiant.getEcole());
-        assertEquals(LocalDate.of(2000, 5, 15), savedEtudiant.getDateNaissance());
+
+        // Ensure type compatibility in assertions
+        assertEquals("Dupont", savedEtudiant.getNomEt()); // String vs String
+        assertEquals("Jean", savedEtudiant.getPrenomEt()); // String vs String
+
+        // Match the type of CIN with expected literal
+        Long expectedCin = 12345678L;
+        assertEquals(expectedCin, savedEtudiant.getCin()); // Long vs Long
+
+        assertEquals("ESPRIT", savedEtudiant.getEcole()); // String vs String
+
+        // Match LocalDate types explicitly
+        LocalDate expectedDate = LocalDate.of(2000, 5, 15);
+        assertEquals(expectedDate, savedEtudiant.getDateNaissance()); // LocalDate vs LocalDate
 
         System.out.println("✅ Etudiant created successfully with ID: " + savedEtudiant.getIdEtudiant());
     }
+
+
 
     @Test
     @Order(2)
