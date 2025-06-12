@@ -5,6 +5,11 @@ pipeline{
         SONAR_TOKEN = '04570e1f89a3b4ea53cca10f08a70357bbbd8139'
     }
     stages{
+        //   stage('Set Version') {
+        //     steps {
+        //         sh "mvn versions:set -DnewVersion=${VERSION}"
+        //     }
+        // }
         stage('get from github'){
             steps{
                 echo 'pulling from tahani branch';
@@ -38,18 +43,24 @@ pipeline{
                 sh "mvn sonar:sonar -Dsonar.url=${SONARQUBE_SERVER} -Dsonar.login=${SONAR_TOKEN}"
             }
         }
-        // stage('MVN deploy'){
-        //     steps{
-        //         echo 'deploying';
-        //         sh "mvn deploy"
-        //     }
-        // }
         stage('MVN package'){
             steps{
                 echo 'MVN package';
                 sh "mvn package"
             }
         }
+        //       stage('Deploy to Nexus') {
+        //     steps {
+        //         script {
+        //             def pom = readMavenPom file: 'pom.xml'
+        //             def version = pom.version
+        //             def repo = version.contains("SNAPSHOT") ? "maven-snapshots" : "maven-releases"
+        //             def repoUrl = "http://172.26.160.39:8081/repository/${repo}"
+
+        //             sh "mvn deploy"
+        //         }
+        //     }
+        // }
          stage('Building image docker'){
               steps{
                  echo 'building ...';
@@ -67,6 +78,23 @@ pipeline{
                 //   }
               }
           }
+           stage('Docker Compose') {
+            steps {
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d'
+            }
+        }
+
+
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline terminée avec succès !'
+        }
+        failure {
+            echo '❌ La pipeline a échoué.'
+        }
 
 
     }
