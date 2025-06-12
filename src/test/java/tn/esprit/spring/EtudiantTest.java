@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import tn.esprit.spring.DAO.Entities.Etudiant;
-import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
+import tn.esprit.spring.dao.entities.Etudiant;
+import tn.esprit.spring.dao.repositories.EtudiantRepository;
 
 import java.time.LocalDate;
 import java.util.List;

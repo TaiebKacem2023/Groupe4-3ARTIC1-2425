@@ -2,11 +2,10 @@ package tn.esprit.spring;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tn.esprit.spring.DAO.Entities.Etudiant;
-import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
+import tn.esprit.spring.dao.entities.Etudiant;
+import tn.esprit.spring.dao.repositories.EtudiantRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
