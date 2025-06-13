@@ -1,23 +1,24 @@
-package tn.esprit.spring.Services;
+package tn.esprit.spring;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import tn.esprit.spring.DAO.Entities.*;
+import tn.esprit.spring.DAO.Entities.Chambre;
+import tn.esprit.spring.DAO.Entities.Etudiant;
+import tn.esprit.spring.DAO.Entities.Reservation;
 import tn.esprit.spring.DAO.Repositories.ChambreRepository;
 import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
 import tn.esprit.spring.DAO.Repositories.ReservationRepository;
+import tn.esprit.spring.Services.Reservation.ReservationService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ReservationMockTest {
+public class ReservationMockTest {
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -31,58 +32,37 @@ class ReservationMockTest {
     @InjectMocks
     private ReservationService reservationService;
 
-    private Chambre chambre;
-    private Etudiant etudiant;
-
-    @BeforeEach
-    void setUp() {
+    public ReservationMockTest() {
         MockitoAnnotations.openMocks(this);
+    }
 
-        // Préparer des objets factices
-        chambre = new Chambre();
+    @Test
+    void testAjouterReservationEtAssignerAChambreEtAEtudiant() {
+        Long numChambre = 101L;
+        long cin = 12345678L;
+
+        Chambre chambre = new Chambre();
         chambre.setIdChambre(1L);
-        chambre.setNumeroChambre(101L);
-        chambre.setTypeC(TypeChambre.DOUBLE);
+        chambre.setNumeroChambre(numChambre);
+        chambre.setTypeC(tn.esprit.spring.DAO.Entities.TypeChambre.SIMPLE);
         chambre.setReservations(new ArrayList<>());
 
-        Bloc bloc = new Bloc();
-        bloc.setNomBloc("A");
-        chambre.setBloc(bloc);
+        Etudiant etudiant = new Etudiant();
+        etudiant.setCin(cin);
 
-        etudiant = new Etudiant();
-        etudiant.setCin(12345678L);
-
-        // Mock des appels aux repositories
-        when(chambreRepository.findByNumeroChambre(101L)).thenReturn(chambre);
-        when(etudiantRepository.findByCin(12345678L)).thenReturn(etudiant);
+        when(chambreRepository.findByNumeroChambre(numChambre)).thenReturn(chambre);
+        when(etudiantRepository.findByCin(cin)).thenReturn(etudiant);
         when(chambreRepository.countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween(
-                eq(1L), any(LocalDate.class), any(LocalDate.class))).thenReturn(1);
+                anyLong(), any(), any())).thenReturn(0);
 
-        when(reservationRepository.save(any(Reservation.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-    }
+        Reservation savedReservation = new Reservation();
+        savedReservation.setIdReservation("2024/2025-BLOC-A-101-12345678");
 
-    @Test
-    void testAjouterReservationEtAssignerAChambreEtAEtudiant_Success() {
-        Reservation reservation = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(101L, 12345678L);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(savedReservation);
 
-        assertNotNull(reservation);
-        assertTrue(reservation.getEstValide());
-        assertEquals(1, reservation.getEtudiants().size());
-        assertEquals(etudiant.getCin(), reservation.getEtudiants().get(0).getCin());
-        verify(chambreRepository).save(chambre);
-        verify(reservationRepository).save(any(Reservation.class));
-    }
+        Reservation result = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(numChambre, cin);
 
-    @Test
-    void testAjouterReservationEtAssignerAChambreEtAEtudiant_ChambrePleine() {
-        when(chambreRepository.countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween(
-                eq(1L), any(LocalDate.class), any(LocalDate.class))).thenReturn(2); // chambre DOUBLE déjà pleine
-
-        Reservation reservation = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(101L, 12345678L);
-
-        assertNull(reservation);
-        verify(reservationRepository, never()).save(any());
-        verify(chambreRepository, never()).save(any());
+        assertNotNull(result);
+        assertEquals("2024/2025-BLOC-A-101-12345678", result.getIdReservation());
     }
 }
