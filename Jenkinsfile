@@ -3,7 +3,7 @@ pipeline{
     stages{
         stage('get from github'){
             steps{
-                echo 'pulling from tahani branch';
+                echo 'pulling from khouloud branch';
                 git branch : 'main',
                 url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
                 credentialsId:'github-ssh-key'
@@ -58,7 +58,7 @@ pipeline{
           stage('pushing'){
               steps{
                   echo 'pushing to docker'
-                  //sh " docker push tahanicherif/foyer:1.0.0"
+                  //sh " docker push khouloud01/foyer:1.0.0"
                   withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                       sh " docker push tahanicherif/foyer:1.0.0"
                   }
