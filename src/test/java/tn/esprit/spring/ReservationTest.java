@@ -1,88 +1,121 @@
 package tn.esprit.spring;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import tn.esprit.spring.DAO.Entities.Etudiant;
 import tn.esprit.spring.DAO.Entities.Reservation;
-import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
 import tn.esprit.spring.DAO.Repositories.ReservationRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
-@AutoConfigureTestDatabase
 @Transactional
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReservationTest {
 
     @Autowired
-    ReservationRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
-    @Autowired
-    EtudiantRepository etudiantRepository;
+    private Reservation reservationTest;
+    private static String savedReservationId;
 
-    @Test
-    public void testCreateReservationWithEtudiants() {
-        // Créer deux étudiants
-        Etudiant e1 = Etudiant.builder()
-                .nomEt("Doe")
-                .prenomEt("John")
-                .cin(12345678)
-                .ecole("ESPRIT")
-                .build();
-
-        Etudiant e2 = Etudiant.builder()
-                .nomEt("Smith")
-                .prenomEt("Anna")
-                .cin(87654321)
-                .ecole("ISI")
-                .build();
-
-        e1 = etudiantRepository.save(e1);
-        e2 = etudiantRepository.save(e2);
-
-        // Créer une réservation liée aux deux étudiants
-        Reservation reservation = Reservation.builder()
-                .idReservation("RES1")
-                .anneeUniversitaire(LocalDate.of(2025, 9, 1))
+    @BeforeEach
+    void setUp() {
+        reservationTest = Reservation.builder()
+                .idReservation("2024/2025-B1-101-12345678")
+                .anneeUniversitaire(LocalDate.of(2024, 9, 15))
                 .estValide(true)
-                .etudiants(List.of(e1, e2))
                 .build();
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        // Mise à jour inverse côté étudiant (utile si la relation est bidirectionnelle)
-        e1.getReservations().add(savedReservation);
-        e2.getReservations().add(savedReservation);
-        etudiantRepository.saveAll(List.of(e1, e2));
-
-        // Assertions
-        Assertions.assertNotNull(savedReservation);
-        Assertions.assertEquals("RES1", savedReservation.getIdReservation());
-        Assertions.assertEquals(2, savedReservation.getEtudiants().size());
-        Assertions.assertTrue(savedReservation.isEstValide());
     }
 
     @Test
-    public void testFindReservationById() {
-        // D'abord, on crée une réservation si elle n'existe pas
-        Reservation reservation = Reservation.builder()
-                .idReservation("RES2")
-                .anneeUniversitaire(LocalDate.of(2025, 9, 1))
-                .estValide(true)
-                .build();
+    @Order(1)
+    @DisplayName("Test Create Reservation")
+    void testCreateReservation() {
+        Reservation savedReservation = reservationRepository.save(reservationTest);
+        savedReservationId = savedReservation.getIdReservation();
 
-        reservationRepository.save(reservation);
+        assertNotNull(savedReservation);
+        assertEquals("2024/2025-B1-101-12345678", savedReservation.getIdReservation());
+        assertTrue(savedReservation.isEstValide());
+        assertEquals(LocalDate.of(2024, 9, 15), savedReservation.getAnneeUniversitaire());
 
-        // Ensuite, on la récupère
-        Reservation foundReservation = reservationRepository.findById("RES2").orElse(null);
+        System.out.println("✅ Reservation created with ID: " + savedReservationId);
+    }
 
-        // Vérification
-        Assertions.assertNotNull(foundReservation);
-        Assertions.assertEquals("RES2", foundReservation.getIdReservation());
+    @Test
+    @Order(2)
+    @DisplayName("Test Read Reservation by ID")
+    void testReadReservationById() {
+        reservationRepository.save(reservationTest);
+        Optional<Reservation> found = reservationRepository.findById(reservationTest.getIdReservation());
+
+        assertTrue(found.isPresent());
+        assertEquals("2024/2025-B1-101-12345678", found.get().getIdReservation());
+        assertTrue(found.get().isEstValide());
+
+        System.out.println("✅ Reservation found: " + found.get().getIdReservation());
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("Test Read All Reservations")
+    void testReadAllReservations() {
+        reservationRepository.save(reservationTest);
+        List<Reservation> reservations = reservationRepository.findAll();
+
+        assertNotNull(reservations);
+        assertFalse(reservations.isEmpty());
+
+        System.out.println("✅ Found " + reservations.size() + " reservations");
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Test Update Reservation")
+    void testUpdateReservation() {
+        Reservation saved = reservationRepository.save(reservationTest);
+
+        saved.setEstValide(false);
+        saved.setAnneeUniversitaire(LocalDate.of(2025, 9, 15));
+        Reservation updated = reservationRepository.save(saved);
+
+        assertEquals(saved.getIdReservation(), updated.getIdReservation());
+        assertFalse(updated.isEstValide());
+        assertEquals(LocalDate.of(2025, 9, 15), updated.getAnneeUniversitaire());
+
+        System.out.println("✅ Reservation updated: " + updated.getIdReservation());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Test Delete Reservation")
+    void testDeleteReservation() {
+        Reservation saved = reservationRepository.save(reservationTest);
+        String id = saved.getIdReservation();
+
+        reservationRepository.deleteById(id);
+        Optional<Reservation> deleted = reservationRepository.findById(id);
+
+        assertFalse(deleted.isPresent());
+        System.out.println("✅ Reservation deleted: " + id);
+    }
+
+    @AfterEach
+    void tearDown() {
+        reservationTest = null;
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        System.out.println("🏁 All Reservation CRUD tests completed successfully!");
     }
 }

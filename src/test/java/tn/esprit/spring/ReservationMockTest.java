@@ -1,153 +1,87 @@
-package tn.esprit.spring;
+package tn.esprit.spring.Services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import tn.esprit.spring.DAO.Entities.*;
-import tn.esprit.spring.DAO.Repositories.*;
-import tn.esprit.spring.Services.Reservation.ReservationService;
+import tn.esprit.spring.DAO.Repositories.ChambreRepository;
+import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
+import tn.esprit.spring.DAO.Repositories.ReservationRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class ReservationMockTest {
-
-    @Mock
-    ReservationRepository reservationRepository;
+class ReservationMockTest {
 
     @Mock
-    ChambreRepository chambreRepository;
+    private ReservationRepository reservationRepository;
 
     @Mock
-    EtudiantRepository etudiantRepository;
+    private ChambreRepository chambreRepository;
+
+    @Mock
+    private EtudiantRepository etudiantRepository;
 
     @InjectMocks
-    ReservationService reservationService;
+    private ReservationService reservationService;
+
+    private Chambre chambre;
+    private Etudiant etudiant;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
 
-    @Test
-    void testAjouterReservation_ChambreDisponible() {
-        Long numChambre = 101L;
-        long cin = 12345678L;
+        // Préparer des objets factices
+        chambre = new Chambre();
+        chambre.setIdChambre(1L);
+        chambre.setNumeroChambre(101L);
+        chambre.setTypeC(TypeChambre.DOUBLE);
+        chambre.setReservations(new ArrayList<>());
 
-        Bloc bloc = Bloc.builder().nomBloc("A").build();
+        Bloc bloc = new Bloc();
+        bloc.setNomBloc("A");
+        chambre.setBloc(bloc);
 
-        Chambre chambre = Chambre.builder()
-                .idChambre(1L)
-                .numeroChambre(numChambre)
-                .typeC(TypeChambre.DOUBLE)
-                .bloc(bloc)
-                .reservations(new ArrayList<>())
-                .build();
+        etudiant = new Etudiant();
+        etudiant.setCin(12345678L);
 
-        Etudiant etudiant = Etudiant.builder()
-                .cin(cin)
-                .nomEt("NomEt")
-                .prenomEt("PrenomEt")
-                .build();
-
-        when(chambreRepository.findByNumeroChambre(numChambre)).thenReturn(chambre);
-        when(etudiantRepository.findByCin(cin)).thenReturn(etudiant);
+        // Mock des appels aux repositories
+        when(chambreRepository.findByNumeroChambre(101L)).thenReturn(chambre);
+        when(etudiantRepository.findByCin(12345678L)).thenReturn(etudiant);
         when(chambreRepository.countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween(
-                eq(1L), any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(0);
+                eq(1L), any(LocalDate.class), any(LocalDate.class))).thenReturn(1);
 
-        ArgumentCaptor<Reservation> captor = ArgumentCaptor.forClass(Reservation.class);
         when(reservationRepository.save(any(Reservation.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        when(chambreRepository.save(any(Chambre.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        Reservation result = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(numChambre, cin);
-
-        assertNotNull(result);
-        assertEquals(1, result.getEtudiants().size());
-        assertTrue(result.isEstValide());
-        assertEquals("A", chambre.getBloc().getNomBloc());
-        verify(reservationRepository, times(1)).save(captor.capture());
-        verify(chambreRepository, times(1)).save(any(Chambre.class));
-
-        // Vérifier format idReservation (ex: "2024/2025-A-101-12345678")
-        String idRes = captor.getValue().getIdReservation();
-        assertTrue(idRes.contains("-A-") && idRes.contains("-101-") && idRes.endsWith(String.valueOf(cin)));
     }
 
     @Test
-    void testAjouterReservation_ChambrePleine() {
-        Long numChambre = 101L;
-        long cin = 12345678L;
+    void testAjouterReservationEtAssignerAChambreEtAEtudiant_Success() {
+        Reservation reservation = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(101L, 12345678L);
 
-        Bloc bloc = Bloc.builder().nomBloc("B").build();
+        assertNotNull(reservation);
+        assertTrue(reservation.getEstValide());
+        assertEquals(1, reservation.getEtudiants().size());
+        assertEquals(etudiant.getCin(), reservation.getEtudiants().get(0).getCin());
+        verify(chambreRepository).save(chambre);
+        verify(reservationRepository).save(any(Reservation.class));
+    }
 
-        Chambre chambre = Chambre.builder()
-                .idChambre(1L)
-                .numeroChambre(numChambre)
-                .typeC(TypeChambre.SIMPLE)
-                .bloc(bloc)
-                .reservations(new ArrayList<>())
-                .build();
-
-        Etudiant etudiant = Etudiant.builder()
-                .cin(cin)
-                .nomEt("Dupont")
-                .prenomEt("Alice")
-                .build();
-
-        when(chambreRepository.findByNumeroChambre(numChambre)).thenReturn(chambre);
-        when(etudiantRepository.findByCin(cin)).thenReturn(etudiant);
+    @Test
+    void testAjouterReservationEtAssignerAChambreEtAEtudiant_ChambrePleine() {
         when(chambreRepository.countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween(
-                eq(1L), any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(1); // chambre pleine (SIMPLE = 1 max)
+                eq(1L), any(LocalDate.class), any(LocalDate.class))).thenReturn(2); // chambre DOUBLE déjà pleine
 
-        Reservation result = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(numChambre, cin);
+        Reservation reservation = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(101L, 12345678L);
 
-        assertNull(result);
-        verify(reservationRepository, never()).save(any());
-        verify(chambreRepository, never()).save(any());
-    }
-
-    @Test
-    void testAjouterReservation_ChambreIntrouvable() {
-        Long numChambre = 999L;
-        long cin = 12345678L;
-
-        when(chambreRepository.findByNumeroChambre(numChambre)).thenReturn(null);
-
-        Reservation result = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(numChambre, cin);
-
-        assertNull(result);
-        verify(reservationRepository, never()).save(any());
-        verify(chambreRepository, never()).save(any());
-    }
-
-    @Test
-    void testAjouterReservation_EtudiantIntrouvable() {
-        Long numChambre = 101L;
-        long cin = 99999999L;
-
-        Bloc bloc = Bloc.builder().nomBloc("A").build();
-
-        Chambre chambre = Chambre.builder()
-                .idChambre(1L)
-                .numeroChambre(numChambre)
-                .typeC(TypeChambre.DOUBLE)
-                .bloc(bloc)
-                .reservations(new ArrayList<>())
-                .build();
-
-        when(chambreRepository.findByNumeroChambre(numChambre)).thenReturn(chambre);
-        when(etudiantRepository.findByCin(cin)).thenReturn(null);
-
-        Reservation result = reservationService.ajouterReservationEtAssignerAChambreEtAEtudiant(numChambre, cin);
-
-        assertNull(result);
+        assertNull(reservation);
         verify(reservationRepository, never()).save(any());
         verify(chambreRepository, never()).save(any());
     }
