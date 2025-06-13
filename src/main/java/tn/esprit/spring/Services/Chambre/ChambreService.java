@@ -25,7 +25,8 @@ public class ChambreService implements IChambreService {
 
     @Override
     public Chambre addOrUpdate(Chambre c) {
-        return repo.save(c);
+       Chambre chambre = repo.save(c);
+        return chambre;
     }
 
     @Override
