@@ -23,10 +23,42 @@ public class Bloc{
     String nomBloc;
     long capaciteBloc;
     
+    @Getter
     @ManyToOne
     @JsonIgnore
     Foyer foyer;
     @OneToMany(mappedBy = "bloc", fetch = FetchType.EAGER)
+    @Getter
     @JsonIgnore
     List<Chambre> chambres= new ArrayList<>();
+
+
+    public void setIdBloc(long idBloc) {
+        this.idBloc = idBloc;
+    }
+
+    public void setFoyer(Foyer foyer) {
+        this.foyer = foyer;
+    }
+
+    public void setCapaciteBloc(long capaciteBloc) {
+        this.capaciteBloc = capaciteBloc;
+    }
+
+    public void setChambres(List<Chambre> chambres) {
+        this.chambres = chambres;
+    }
+
+    public void setNomBloc(String nomBloc) {
+        this.nomBloc = nomBloc;
+    }
+
+
+    public Foyer getFoyer() {
+        return foyer;
+    }
+
+    public List<Chambre> getChambres() {
+        return chambres;
+    }
 }

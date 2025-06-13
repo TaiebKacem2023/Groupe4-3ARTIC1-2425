@@ -28,7 +28,53 @@ public class Chambre {
     Bloc bloc;
 
     // Add other chambre attributes and relationships as needed
-}
-enum  TypeChambre {
-    SINGLE, DOUBLE, TRIPLE, QUAD
+
+
+    public void setBloc(Bloc bloc) {
+        this.bloc = bloc;
+    }
+
+    public void setIdChambre(long idChambre) {
+        this.idChambre = idChambre;
+    }
+
+    public long getIdChambre() {
+        return idChambre;
+    }
+
+    public String getNomChambre() {
+        return nomChambre;
+    }
+
+    public void setNomChambre(String nomChambre) {
+        this.nomChambre = nomChambre;
+    }
+
+    public int getCapaciteChambre() {
+        return capaciteChambre;
+    }
+
+    public void setCapaciteChambre(int capaciteChambre) {
+        this.capaciteChambre = capaciteChambre;
+    }
+
+    public int getNumeroChambre() {
+        return numeroChambre;
+    }
+
+    public void setNumeroChambre(int numeroChambre) {
+        this.numeroChambre = numeroChambre;
+    }
+
+    public TypeChambre getTypeChambre() {
+        return typeChambre;
+    }
+
+    public void setTypeChambre(TypeChambre typeChambre) {
+        this.typeChambre = typeChambre;
+    }
+
+    public Bloc getBloc() {
+        return bloc;
+    }
 }

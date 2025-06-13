@@ -27,4 +27,29 @@ public class Foyer {
     List<Bloc> blocs;
 
     // Add other foyer attributes and relationships as needed
+
+
+    public long getIdFoyer() {
+        return idFoyer;
+    }
+
+    public void setIdFoyer(long idFoyer) {
+        this.idFoyer = idFoyer;
+    }
+
+    public String getNomFoyer() {
+        return NomFoyer;
+    }
+
+    public void setNomFoyer(String nomFoyer) {
+        NomFoyer = nomFoyer;
+    }
+
+    public List<Bloc> getBlocs() {
+        return blocs;
+    }
+
+    public void setBlocs(List<Bloc> blocs) {
+        this.blocs = blocs;
+    }
 }

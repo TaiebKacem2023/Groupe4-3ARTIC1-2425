@@ -14,6 +14,7 @@ import tn.esprit.spring.DAO.Repositories.ChambreRepository;
 import tn.esprit.spring.DAO.Repositories.FoyerRepository;
 import tn.esprit.spring.Services.Bloc.BlocService;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -42,25 +43,26 @@ class BlocServiceTest {
 
     @BeforeEach
     void setUp() {
-        bloc = Bloc.builder()
-                .idBloc(1L)
-                .nomBloc("Bloc A")
-                .capaciteBloc(100)
-                .build();
+        // Initialize Bloc using constructor and setters
+        bloc = new Bloc();
+        bloc.setIdBloc(1L);
+        bloc.setNomBloc("Bloc A");
+        bloc.setCapaciteBloc(100);
+        bloc.setChambres(new ArrayList<>()); // Initialize empty list
 
-        chambre1 = Chambre.builder()
-                .idChambre(1L)
-                .build();
+        // Initialize Chambres using constructor and setters
+        chambre1 = new Chambre();
+        chambre1.setIdChambre(1L);
 
-        chambre2 = Chambre.builder()
-                .idChambre(2L)
-                .build();
+        chambre2 = new Chambre();
+        chambre2.setIdChambre(2L);
 
-        foyer = Foyer.builder()
-                .idFoyer(1L)
-                .NomFoyer("Foyer X")
-                .build();
+        // Initialize Foyer using constructor and setters
+        foyer = new Foyer();
+        foyer.setIdFoyer(1L);
+        foyer.setNomFoyer("Foyer X");
 
+        // Set the relationship
         bloc.setChambres(Arrays.asList(chambre1, chambre2));
     }
 
