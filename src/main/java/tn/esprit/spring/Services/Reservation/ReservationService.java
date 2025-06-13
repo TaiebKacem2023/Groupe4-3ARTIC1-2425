@@ -2,6 +2,8 @@ package tn.esprit.spring.Services.Reservation;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.DAO.Entities.Chambre;
 import tn.esprit.spring.DAO.Entities.Etudiant;
@@ -11,6 +13,7 @@ import tn.esprit.spring.DAO.Repositories.ChambreRepository;
 import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
 import tn.esprit.spring.DAO.Repositories.FoyerRepository;
 import tn.esprit.spring.DAO.Repositories.ReservationRepository;
+import tn.esprit.spring.Services.Chambre.ChambreService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +25,7 @@ public class ReservationService implements IReservationService {
     ReservationRepository repo;
     ChambreRepository chambreRepository;
     EtudiantRepository etudiantRepository;
-
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
     @Override
     public Reservation addOrUpdate(Reservation r) {
         return repo.save(r);
@@ -69,18 +72,16 @@ public class ReservationService implements IReservationService {
         }
         return dateFinAU;
     }
-
     @Override
-    public Reservation ajouterReservationEtAssignerAChambreEtAEtudiant
-            (Long numChambre, long cin) {
+    public Reservation ajouterReservationEtAssignerAChambreEtAEtudiant(Long numChambre, long cin) {
         // Récupération de la chambre et de l'étudiant
         Chambre chambre = chambreRepository.findByNumeroChambre(numChambre);
         Etudiant etudiant = etudiantRepository.findByCin(cin);
 
         // Compter le nombre de réservations existantes
-        int nombreReservations = chambreRepository.
-                countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween
-                        (chambre.getIdChambre(), getDateDebutAU(), getDateFinAU());
+        int nombreReservations = chambreRepository
+                .countReservationsByIdChambreAndReservationsAnneeUniversitaireBetween(
+                        chambre.getIdChambre(), getDateDebutAU(), getDateFinAU());
 
         // Vérification de la capacité de la chambre
         boolean ajout = false;
@@ -97,15 +98,13 @@ public class ReservationService implements IReservationService {
         }
 
         if (ajout) {
-            // Création de la réservation
-            String idReservation = "" + getDateDebutAU().getYear() + "/" + getDateFinAU().getYear() + "-" + chambre.getBloc().getNomBloc() + "-"
-                    + chambre.getNumeroChambre() + "-" + etudiant.getCin();
-
-            Reservation reservation = Reservation.builder()
-                    .estValide(true)
-                    .anneeUniversitaire(LocalDate.now())
-                    .idReservation(idReservation)
-                    .build();
+            // Création de la réservation sans builder
+            Reservation reservation = new Reservation();
+            reservation.setEstValide(true);
+            reservation.setAnneeUniversitaire(LocalDate.now());
+            String idReservation = "" + getDateDebutAU().getYear() + "/" + getDateFinAU().getYear() + "-"
+                    + chambre.getBloc().getNomBloc() + "-" + chambre.getNumeroChambre() + "-" + etudiant.getCin();
+            reservation.setIdReservation(idReservation);
 
             // Affectation de l'étudiant à la réservation
             reservation.getEtudiants().add(etudiant);
@@ -121,8 +120,9 @@ public class ReservationService implements IReservationService {
         }
 
         // Retourner null ou lever une exception plutôt que de retourner une nouvelle réservation vide
-        return null; // Ou vous pouvez lever une exception pour indiquer que l'ajout a échoué
+        return null;
     }
+
 
 
     @Override

@@ -26,5 +26,35 @@ public class Reservation implements Serializable {
     @ManyToMany
     @JsonIgnore
     List<Etudiant> etudiants = new ArrayList<>();
+    public String getIdReservation() {
+        return idReservation;
+    }
 
+    public void setIdReservation(String idReservation) {
+        this.idReservation = idReservation;
+    }
+
+    public LocalDate getAnneeUniversitaire() {
+        return anneeUniversitaire;
+    }
+
+    public void setAnneeUniversitaire(LocalDate anneeUniversitaire) {
+        this.anneeUniversitaire = anneeUniversitaire;
+    }
+
+    public boolean isEstValide() {
+        return estValide;
+    }
+
+    public void setEstValide(boolean estValide) {
+        this.estValide = estValide;
+    }
+
+    public List<Etudiant> getEtudiants() {
+        return etudiants;
+    }
+
+    public void setEtudiants(List<Etudiant> etudiants) {
+        this.etudiants = etudiants;
+    }
 }

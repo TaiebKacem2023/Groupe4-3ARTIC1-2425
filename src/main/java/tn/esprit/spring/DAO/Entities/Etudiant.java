@@ -28,6 +28,15 @@ public class Etudiant implements Serializable {
     LocalDate dateNaissance;
     @ManyToMany(mappedBy = "etudiants")
     List<Reservation> reservations= new ArrayList<>();
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
 
-
+    // setter
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+    public long getCin() {
+        return this.cin;
+    }
 }

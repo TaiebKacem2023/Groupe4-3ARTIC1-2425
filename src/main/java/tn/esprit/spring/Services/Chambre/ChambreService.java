@@ -1,7 +1,9 @@
 package tn.esprit.spring.Services.Chambre;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.DAO.Entities.Bloc;
@@ -19,38 +21,41 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class ChambreService implements IChambreService {
-    private final ChambreRepository chambreRepository;
-    ChambreRepository repo;
-    BlocRepository blocRepository;
+    @Autowired
+    private ChambreRepository chambreRepository;
 
+    @Autowired
+    private BlocRepository blocRepository;
+
+    private static final Logger log = LoggerFactory.getLogger(ChambreService.class);
     @Override
     public Chambre addOrUpdate(Chambre c) {
-        return repo.save(c);
+        return chambreRepository.save(c);
     }
 
     @Override
     public List<Chambre> findAll() {
-        return repo.findAll();
+        return chambreRepository.findAll();
     }
 
     @Override
     public Chambre findById(long id) {
-        return repo.findById(id).get();
+        return chambreRepository.findById(id).get();
     }
 
     @Override
     public void deleteById(long id) {
-        repo.deleteById(id);
+        chambreRepository.deleteById(id);
     }
 
     @Override
     public void delete(Chambre c) {
-        repo.delete(c);
+        chambreRepository.delete(c);
     }
 
     @Override
     public List<Chambre> getChambresParNomBloc(String nomBloc) {
-        return repo.findByBlocNomBloc(nomBloc);
+        return chambreRepository.findByBlocNomBloc(nomBloc);
     }
 
     @Override
@@ -88,7 +93,7 @@ public class ChambreService implements IChambreService {
         }
         // Fin "récuperer l'année universitaire actuelle"
         List<Chambre> listChambreDispo = new ArrayList<>();
-        for (Chambre c : repo.findAll()) {
+        for (Chambre c : chambreRepository.findAll()) {
             if (c.getTypeC().equals(type) && c.getBloc().getFoyer().getNomFoyer().equals(nomFoyer)) { // Les chambres du foyer X et qui ont le type Y
                 numReservation = 0;
                 // nchoufou les réservations mta3 AU hethy binesba lil bit heki
@@ -130,10 +135,10 @@ public class ChambreService implements IChambreService {
 
     @Override
     public void pourcentageChambreParTypeChambre() {
-        long totalChambre = repo.count();
-        double pSimple = (double) (repo.countChambreByTypeC(TypeChambre.SIMPLE) * 100) / totalChambre;
-        double pDouble = (double) (repo.countChambreByTypeC(TypeChambre.DOUBLE) * 100) / totalChambre;
-        double pTriple = (double) (repo.countChambreByTypeC(TypeChambre.TRIPLE) * 100) / totalChambre;
+        long totalChambre = chambreRepository.count();
+        double pSimple = (double) (chambreRepository.countChambreByTypeC(TypeChambre.SIMPLE) * 100) / totalChambre;
+        double pDouble = (double) (chambreRepository.countChambreByTypeC(TypeChambre.DOUBLE) * 100) / totalChambre;
+        double pTriple = (double) (chambreRepository.countChambreByTypeC(TypeChambre.TRIPLE) * 100) / totalChambre;
         log.info("Nombre total des chambre: " + totalChambre);
         log.info("Le pourcentage des chambres pour le type SIMPLE est égale à " + pSimple);
         log.info("Le pourcentage des chambres pour le type DOUBLE est égale à " + pDouble);
@@ -156,8 +161,8 @@ public class ChambreService implements IChambreService {
             dateFinAU = LocalDate.of(Integer.parseInt("20" + (year + 1)), 6, 30);
         }
         // Fin "récuperer l'année universitaire actuelle"
-        for (Chambre c : repo.findAll()) {
-            long nbReservation = repo.countReservationsByIdChambreAndReservationsEstValideAndReservationsAnneeUniversitaireBetween(c.getIdChambre()
+        for (Chambre c : chambreRepository.findAll()) {
+            long nbReservation = chambreRepository.countReservationsByIdChambreAndReservationsEstValideAndReservationsAnneeUniversitaireBetween(c.getIdChambre()
                     , true, dateDebutAU, dateFinAU);
             switch (c.getTypeC()) {
                 case SIMPLE:
@@ -192,16 +197,16 @@ public class ChambreService implements IChambreService {
 
     @Override
     public List<Chambre> getChambresParNomBlocKeyWord(String nomBloc) {
-        return repo.findByBlocNomBloc(nomBloc);
+        return chambreRepository.findByBlocNomBloc(nomBloc);
     }
 
     @Override
     public List<Chambre> getChambresParNomBlocJPQL(String nomBloc) {
-        return repo.getChambresParNomBlocJPQL(nomBloc);
+        return chambreRepository.getChambresParNomBlocJPQL(nomBloc);
     }
 
     @Override
     public List<Chambre> getChambresParNomBlocSQL(String nomBloc) {
-        return repo.getChambresParNomBlocSQL(nomBloc);
+        return chambreRepository.getChambresParNomBlocSQL(nomBloc);
     }
 }
