@@ -4,6 +4,9 @@ pipeline{
 
 		SONARQUBE_SERVER = 'http://localhost:9000/'
         SONAR_TOKEN = 'a476724a264cb65208717568adef73e9b079677c'
+        DOCKERHUB_CREDENTIALS = 'token-dockerhub'
+        IMAGE_NAME = 'foyer'
+        IMAGE_TAG = 'latest'
 
     }
     stages{
@@ -15,22 +18,30 @@ pipeline{
                 credentialsId:'github-ssh'
             }
         }
+        stage('RUN DATABASE'){
+			steps{
+				echo 'run database';
+                sh "docker-compose up --build -d database"
+                sh "sleep 20"
+            }
+        }
         stage('MVN clean'){
 			steps{
 				echo 'cleaning';
                sh "mvn clean"
             }
         }
-        // stage('MVN install'){
-        //     steps{
-        //         echo 'installing';
-        //          sh "mvn install"
-        //          }
-        // }
         stage('MVN compile'){
 			steps{
 				echo 'compiling';
                 sh "mvn compile"
+            }
+        }
+
+        stage('MVN test'){
+			steps{
+				echo 'testing';
+                sh "mvn test"
             }
         }
         stage('SonarQube analysis') {
@@ -39,43 +50,58 @@ pipeline{
                 sh "mvn sonar:sonar -Dsonar.url=${SONARQUBE_SERVER} -Dsonar.login=${SONAR_TOKEN}"
             }
         }
-        stage('MVN test'){
+        stage('MVN package'){
 			steps{
-				echo 'testing';
-                sh "mvn test"
+				echo 'MVN package';
+                sh "mvn package"
             }
         }
-        //stage('MVN sonarqube'){
-             //steps{
-             //    echo 'quality code';
-             //    withSonarQubeEnv('examenTpFoyer') {
-             //        sh 'mvn sonar:sonar -Dsonar.projectKey=examenTpFoyer'
-            //     }
-           //  }
-      //   }
-        // stage('MVN deploy'){
-        //     steps{
-        //         echo 'deploying';
-        //         sh "mvn deploy"
-        //     }
-        // }
-         stage('Building image'){
+              stage('Deploy to Nexus') {
+			steps {
+				script {
+					sh "mvn deploy"
+                }
+            }
+        }
+         stage('Building image docker'){
 			steps{
 				echo 'building ...';
-                 sh "docker build -t taiebkacem/foyer:1.0.0 ."
+                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
               }
          }
+          stage('Push docker image') {
+			steps {
+				withCredentials([usernamePassword(
+                    credentialsId: DOCKERHUB_CREDENTIALS,
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                )]) {
+					echo 'Login ...'
+                    sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                    echo 'Tagging image...'
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    echo 'Pushing docker image to docker hub...'
+                    sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+           stage('Docker Compose') {
+			steps {
+				sh 'docker-compose down || true'
+                sh 'docker-compose up -d --build'
+            }
+        }
 
-         stage('pushing'){
-			steps{
-				echo 'pushing to docker'
-                  sh "docker login -u taiebkacem -p Azerty@123--"
-                  sh " docker push taiebkacem/foyer:1.0.0"
-                //   withCredentials([usernamePassword(credentialsId: 'd8b99c11-39f9-49f8-8718-97581a71865a', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                //       sh " docker push taiebkacem/foyer:1.0.0"
-                //   }
-              }
-          }
+
+    }
+
+    post {
+		success {
+			echo '✅ Pipeline terminée avec succès !'
+        }
+        failure {
+			echo '❌ La pipeline a échoué.'
+        }
 
 
     }
