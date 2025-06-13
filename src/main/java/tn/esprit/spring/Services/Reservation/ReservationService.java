@@ -23,7 +23,8 @@ public class ReservationService implements IReservationService {
 
     @Override
     public Reservation addOrUpdate(Reservation r) {
-        return repo.save(r);
+        Reservation res = repo.save(r);
+        return res;
     }
 
     @Override
