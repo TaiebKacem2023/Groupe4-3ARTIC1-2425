@@ -6,6 +6,15 @@ pipeline{
         SONAR_TOKEN = 'a476724a264cb65208717568adef73e9b079677c'
 
     }
+    stages{
+		stage('get from github'){
+			steps{
+				echo 'pulling from taieb branch';
+                git branch : 'Taieb-Kacem-Foyer',
+                url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
+                credentialsId:'github-ssh'
+            }
+        }
         stage('MVN clean'){
 			steps{
 				echo 'cleaning';
