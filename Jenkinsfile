@@ -10,22 +10,7 @@ pipeline{
 
     }
     stages{
-		stage('get from github'){
-			steps{
-				echo 'pulling from taieb branch';
-                git branch : 'Taieb-Kacem-Foyer',
-                url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
-                credentialsId:'github-ssh'
-            }
-        }
-        stage('RUN DATABASE'){
-			steps{
-				echo 'run database';
-                sh "docker-compose up --build -d database"
-                sh "sleep 20"
-            }
-        }
-        stage('MVN clean'){
+		stage('MVN clean'){
 			steps{
 				echo 'cleaning';
                sh "mvn clean"
@@ -44,6 +29,14 @@ pipeline{
                 sh "mvn test"
             }
         }
+		stage('RUN DATABASE'){
+			steps{
+				echo 'run database';
+                sh "docker-compose up --build -d database"
+                sh "sleep 20"
+            }
+        }
+
         stage('SonarQube analysis') {
 			steps {
 				echo "Code analysis"
