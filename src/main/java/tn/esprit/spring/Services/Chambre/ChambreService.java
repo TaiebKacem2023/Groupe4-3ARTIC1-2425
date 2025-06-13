@@ -35,8 +35,10 @@ public class ChambreService implements IChambreService {
 
     @Override
     public Chambre findById(long id) {
-        return repo.findById(id).get();
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Chambre avec ID " + id + " non trouvée"));
     }
+
 
     @Override
     public void deleteById(long id) {
