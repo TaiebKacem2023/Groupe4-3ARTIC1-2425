@@ -3,10 +3,10 @@ package tn.esprit.spring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import tn.esprit.spring.DAO.Entities.Chambre;
-import tn.esprit.spring.DAO.Entities.TypeChambre;
-import tn.esprit.spring.Services.Chambre.ChambreService;
-import tn.esprit.spring.DAO.Repositories.ChambreRepository;
+import tn.esprit.spring.dao.entities.Chambre;
+import tn.esprit.spring.dao.entities.TypeChambre;
+import tn.esprit.spring.services.chambre.ChambreService;
+import tn.esprit.spring.dao.repositories.ChambreRepository;
 
 import java.util.Optional;
 
