@@ -5,11 +5,11 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
-@Aspect // Pour considérer cette classe comme "Aspect"
-@Component // Pour considérer cette classe comme "Bean Spring"
+@Aspect
+@Component
 @Slf4j
 public class FoyerAspect4SIM2 /* La classe: Aspect */  {
-    // Les méthodes : Advices
+
 
     @After("execution(* tn.esprit.spring.services..*.*(..))")
     public void afterAdvice(JoinPoint jp){
@@ -29,14 +29,5 @@ public class FoyerAspect4SIM2 /* La classe: Aspect */  {
         log.info("Ranni méthode ajouter");
     }
 
-   // @Around("execution(* tn.esprit.spring.Services..*.*(..))")
-//public Object profile(ProceedingJoinPoint pjp) throws Throwable
-   // {
-      //  long start = System.currentTimeMillis();
-       // //Object obj = pjp.proceed();
-       // long elapsedTime = System.currentTimeMillis() - start;
-       // log.info("Method execution time: " + elapsedTime + " milliseconds.");
-        //return obj;
-      //  return null;
-    //}
+
 }

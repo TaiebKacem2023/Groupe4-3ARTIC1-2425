@@ -9,13 +9,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @Slf4j
-public class FoyerAspect4SE1 { // La classe : Aspect
-
-    // @After() ==> Après l'exécution
-    // @AfterThrowing() ==> Après le déclenchement d'une exception
-    // @AfterReturning() ==> Après la bonne exécution
-    // @Before() ==> Avant l'exécution
-    // @Around() ==> En // avec l'exécution
+public class FoyerAspect4SE1 {
 
     @Before("execution(* tn.esprit.spring.services..*.*(..))")
     public void hello(JoinPoint jp){ // La méthode : Advice
@@ -27,12 +21,5 @@ public class FoyerAspect4SE1 { // La classe : Aspect
         log.info("Out of method "+jp.getSignature().getName());
     }
 
-   // @Around("execution(* tn.esprit.spring.Services..*.*(..))")
-   // public Object execution(ProceedingJoinPoint pjp) throws Throwable {
-    //    long start = System.currentTimeMillis();
-    //    Object obj = pjp.proceed();
-     //   long elapsedTime = System.currentTimeMillis() - start;
-     //   log.info("Method execution time: " + elapsedTime + " milliseconds.");
-      //  return obj;
-  //  }
+
 }
