@@ -1,10 +1,10 @@
 package tn.esprit.spring.Services.Foyer;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.DAO.Entities.*;
 import tn.esprit.spring.DAO.Repositories.BlocRepository;
-import tn.esprit.spring.DAO.Repositories.EtudiantRepository;
 import tn.esprit.spring.DAO.Repositories.FoyerRepository;
 import tn.esprit.spring.DAO.Repositories.UniversiteRepository;
 
@@ -13,34 +13,36 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class FoyerService implements IFoyerService {
-    private final FoyerRepository foyerRepository;
-    FoyerRepository repo;
-    UniversiteRepository universiteRepository;
-    BlocRepository blocRepository;
+    @Autowired
+    private FoyerRepository foyerRepository;
+    @Autowired
+    private  UniversiteRepository universiteRepository;
+    @Autowired
+    private  BlocRepository blocRepository;
 
     @Override
     public Foyer addOrUpdate(Foyer f) {
-        return repo.save(f);
+        return foyerRepository.save(f);
     }
 
     @Override
     public List<Foyer> findAll() {
-        return repo.findAll();
+        return foyerRepository.findAll();
     }
 
     @Override
     public Foyer findById(long id) {
-        return repo.findById(id).get();
+        return foyerRepository.findById(id).get();
     }
 
     @Override
     public void deleteById(long id) {
-        repo.deleteById(id);
+        foyerRepository.deleteById(id);
     }
 
     @Override
     public void delete(Foyer f) {
-        repo.delete(f);
+        foyerRepository.delete(f);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class FoyerService implements IFoyerService {
         // Récuperer la liste des blocs avant de faire l'ajout
         List<Bloc> blocs = foyer.getBlocs();
         // Foyer est le child et universite est parent
-        Foyer f = repo.save(foyer);
+        Foyer f = foyerRepository.save(foyer);
         Universite u = universiteRepository.findById(idUniversite).get();
         // Foyer est le child et bloc est le parent
         //On affecte le child au parent
@@ -82,7 +84,7 @@ public class FoyerService implements IFoyerService {
 //        return f;
         //-----------------------------------------
         List<Bloc> blocs = foyer.getBlocs();
-        foyer = repo.save(foyer);
+        foyer = foyerRepository.save(foyer);
         for (Bloc b : blocs) {
             b.setFoyer(foyer);
             blocRepository.save(b);

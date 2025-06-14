@@ -1,7 +1,5 @@
 package tn.esprit.spring;
 
-
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -17,7 +15,7 @@ import static org.mockito.Mockito.*;
 class Foyertest {
 
     @InjectMocks
-    FoyerService foyerService;
+    FoyerService foyerService; // Mockito va injecter les mocks ici
 
     @Mock
     FoyerRepository foyerRepository;
@@ -30,9 +28,7 @@ class Foyertest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        // Solution au problème de double déclaration de foyerRepository (repo + foyerRepository)
-        foyerService = new FoyerService(foyerRepository, foyerRepository, universiteRepository, blocRepository);
+        MockitoAnnotations.openMocks(this); // initialise les mocks
     }
 
     @Test
@@ -60,7 +56,7 @@ class Foyertest {
     @Test
     void testFindById() {
         Foyer foyer = new Foyer();
-        foyer.setIdFoyer(1L);
+        foyer.setIdFoyer(1L); // fonctionne si Lombok est bien activé avec @Setter
         when(foyerRepository.findById(1L)).thenReturn(Optional.of(foyer));
 
         Foyer result = foyerService.findById(1L);
@@ -122,7 +118,7 @@ class Foyertest {
         foyer.setBlocs(List.of(bloc1, bloc2));
 
         when(foyerRepository.save(any())).thenReturn(foyer);
-        when(blocRepository.save(any())).thenReturn(bloc1); // Mock save for each bloc
+        when(blocRepository.save(any())).thenReturn(bloc1);
 
         Foyer result = foyerService.ajoutFoyerEtBlocs(foyer);
 
@@ -157,4 +153,3 @@ class Foyertest {
         assertNull(result.getFoyer());
     }
 }
-

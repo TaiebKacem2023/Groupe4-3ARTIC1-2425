@@ -22,5 +22,11 @@ public class Universite implements Serializable {
     String adresse;
     @OneToOne(cascade = CascadeType.ALL) //ajout, Modif et suppression
     Foyer foyer;
+    public Foyer getFoyer() {
+        return foyer;
+    }
 
+    public void setFoyer(Foyer foyer) {
+        this.foyer = foyer;
+    }
 }
