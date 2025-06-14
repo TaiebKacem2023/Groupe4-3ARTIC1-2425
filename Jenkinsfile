@@ -8,14 +8,14 @@ pipeline{
         IMAGE_TAG = 'latest'
     }
     stages{
-        stage('get from github'){
-            steps{
-                echo 'pulling from tahani branch';
-                git branch : 'tahani-cherif-etudiant',
-                url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
-                credentialsId:'github-ssh-key'
-            }
-        }
+       // stage('get from github'){
+           // steps{
+         //       echo 'pulling from tahani branch';
+             //   git branch : 'tahani-cherif-etudiant',
+               // url : 'git@github.com:TaiebKacem2023/Groupe4-3ARTIC1-2425.git',
+                //credentialsId:'github-ssh-key'
+           // }
+        //}
          stage('RUN DATABASE'){
     steps{
         echo 'Stopping and removing any existing database container...';
