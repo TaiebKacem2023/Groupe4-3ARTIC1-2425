@@ -25,25 +25,4 @@ public class Foyer implements Serializable {
     Universite universite;
     @OneToMany(mappedBy = "foyer")
     List<Bloc> blocs= new ArrayList<>();
-    public String getNomFoyer() {
-        return nomFoyer;
-    }
-
-    public void setNomFoyer(String nomFoyer) {
-        this.nomFoyer = nomFoyer;
-    }
-    public List<Bloc> getBlocs() {
-        return blocs;
-    }
-    public Long getIdFoyer() {
-        return idFoyer;
-    }
-
-    public void setIdFoyer(Long idFoyer) {
-        this.idFoyer = idFoyer;
-    }
-    // Setter
-    public void setBlocs(List<Bloc> blocs) {
-        this.blocs = blocs;
-    }
 }
