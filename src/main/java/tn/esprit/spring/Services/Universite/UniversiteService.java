@@ -26,8 +26,10 @@ public class UniversiteService implements IUniversiteService {
 
     @Override
     public Universite findById(long id) {
-        return repo.findById(id).get();
+        return repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Université avec id " + id + " introuvable"));
     }
+
 
     @Override
     public void deleteById(long id) {
