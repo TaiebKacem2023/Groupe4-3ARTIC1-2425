@@ -2,7 +2,7 @@ pipeline{
     agent any
      environment {
         SONARQUBE_SERVER = 'http://localhost:9000/'
-        SONAR_TOKEN = '04570e1f89a3b4ea53cca10f08a70357bbbd8139'
+        SONAR_TOKEN = '4225d12c02a1166b5b29b55a993a08b3e0bd4cf7'
         DOCKERHUB_CREDENTIALS = 'token-dockerhub'
         IMAGE_NAME = 'foyer'
         IMAGE_TAG = 'latest'
@@ -16,13 +16,16 @@ pipeline{
                 credentialsId:'github-ssh-key'
             }
         }
-          stage('RUN DATABASE'){
-            steps{
-                echo 'run database';
-                sh "docker-compose up --build -d database"
-                sh "sleep 20"
-            }
-        }
+         stage('RUN DATABASE'){
+    steps{
+        echo 'Stopping and removing any existing database container...';
+        sh "docker rm -f database || true"
+        echo 'Starting database container...';
+        sh "docker-compose up --build -d database"
+        sh "sleep 20"
+    }
+}
+
         stage('MVN clean'){
             steps{
                echo 'cleaning';
@@ -85,6 +88,11 @@ pipeline{
         }
            stage('Docker Compose') {
             steps {
+                 echo '🧹 Stopping and removing old containers...'
+                sh '''
+                    docker stop phpmyadmin backend || true
+                    docker rm phpmyadmin backend || true
+                '''
                 sh 'docker-compose down || true'
                 sh 'docker-compose up -d --build'
             }
