@@ -13,7 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class ChambreServiceTest {
+class ChambreMockTest {
 
     @Mock
     ChambreRepository chambreRepository;
